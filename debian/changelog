@@ -1,0 +1,5 @@
+nomad-firewall (0.1-1) nxos; urgency=medium
+
+  * Initial release
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Tue, 27 Jun 2017 16:07:53 -0500
