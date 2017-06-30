@@ -1,3 +1,9 @@
+nomad-firewall (0.2-1) nxos; urgency=medium
+
+  * Transform standalone application into a KCM. 
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Thu, 29 Jun 2017 19:41:41 -0500
+
 nomad-firewall (0.1-1) nxos; urgency=medium
 
   * Initial release
