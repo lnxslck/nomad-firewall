@@ -1,3 +1,9 @@
+nomad-firewall (0.3-2) nxos; urgency=medium
+
+  * Patch segfault when opened with systemsettings5.
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Wed, 12 Jul 2017 16:32:07 -0500
+
 nomad-firewall (0.3-1) nxos; urgency=medium
 
   * Connections visualization and rules generation from connections.
