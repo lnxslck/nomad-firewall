@@ -1,3 +1,9 @@
+nomad-firewall (0.3-1) nxos; urgency=medium
+
+  * Connections visualization and rules generation from connections.
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Wed, 12 Jul 2017 13:48:42 -0500
+
 nomad-firewall (0.2-2) nxos; urgency=medium
 
   * Using FrameSvgItem instead of Rectangle as backgrounds.
