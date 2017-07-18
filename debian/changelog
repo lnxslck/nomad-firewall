@@ -1,3 +1,9 @@
+nomad-firewall (0.4-2) nxos; urgency=medium
+
+  * Create rule from logs.
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Tue, 18 Jul 2017 18:42:43 -0500
+
 nomad-firewall (0.4-1) nxos; urgency=medium
 
   * Displaying firewall logs 
