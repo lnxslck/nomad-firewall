@@ -1,3 +1,9 @@
+nomad-firewall (0.4-1) nxos; urgency=medium
+
+  * Displaying firewall logs 
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Tue, 18 Jul 2017 14:33:25 -0500
+
 nomad-firewall (0.3-2) nxos; urgency=medium
 
   * Patch segfault when opened with systemsettings5.
