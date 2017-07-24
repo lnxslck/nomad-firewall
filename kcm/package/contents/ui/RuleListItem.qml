@@ -5,120 +5,233 @@ import QtQuick.Controls 1.4
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
 
-MouseArea {
+Item {
     id: itemRoot
-    height: 48
-    anchors.left: parent.left
-    anchors.right: parent.right
 
-    hoverEnabled: true
+    property bool dropAreasVisible: false
 
     signal move(int from, int to)
     signal edit(int index)
     signal remove(int index)
 
-    z: dragArea.pressed ? 100 : 0
+    height: upperSpacer.height + dragableItem.height + lowerSpacer.height
 
-    Rectangle {
-        id: background
-        anchors.fill: parent
-        opacity: 0
-        color: theme.highlightColor
+    DropArea {
+        id: upperDropArea
+        anchors {
+            top: parent.top
+            bottom: dragableItem.verticalCenter
+            left: parent.left
+            right: parent.right
+        }
 
-        visible: itemRoot.containsMouse
+        visible: dropAreasVisible && !dragArea.drag.active
+        enabled: !dragArea.drag.active && index == 0
+
+        onEntered: drag.source.dropIndex = index
+        onExited: drag.source.dropIndex = 0
     }
 
-    RowLayout {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+    PlasmaCore.FrameSvgItem {
+        id: upperSpacer
         anchors.left: parent.left
+        anchors.right: parent.right
+        imagePath: "translucent/widgets/panel-background"
+
+        height: 0
+        visible: false
+
+        PlasmaComponents.Label {
+            text: i18n("Drop rule")
+            anchors.centerIn: parent
+        }
+
+        states: [
+            State {
+                name: "expanded"
+                when: upperDropArea.containsDrag
+                PropertyChanges {
+                    target: upperSpacer
+                    height: dragableItem.height
+                    visible: true
+                }
+            }
+        ]
+
+        transitions: Transition {
+            NumberAnimation {
+                properties: "height"
+                easing.type: Easing.InOutQuad
+                duration: 200
+            }
+        }
+    }
+
+    PlasmaComponents.ListItem {
+        id: dragableItem
+        y: upperSpacer.height
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 42
+
+        property int dropIndex: -1
+        property int base_x: 0
+        property int base_y: 0
+
+        Component.onCompleted: {
+            dragableItem.base_x = dragableItem.x
+            dragableItem.base_y = dragableItem.y
+        }
 
         MouseArea {
-            id: dragArea
+            id: itemRootMouseArea
+            anchors.fill: parent
+            hoverEnabled: true
 
-            Layout.fillHeight: true
-            Layout.leftMargin: 12
-            Layout.minimumWidth: 18
-            Layout.minimumHeight: 18
+            acceptedButtons: Qt.LeftButton
+            onClicked: edit(index)
 
-            drag.target: itemRoot
-            PlasmaCore.IconItem {
-                anchors.fill: parent
+            onEntered: eraseButton.visible = true
+            onExited: eraseButton.visible = false
+            propagateComposedEvents: true
+        }
 
-                source: "show-grid"
-            }
+        checked: dragArea.drag.active
 
-            drag.onActiveChanged: {
-                if (!dragArea.drag.active) {
-                    var newIndex = (itemRoot.y + (itemRoot.height / 2)) / itemRoot.height
-                    move(index, newIndex)
+        Drag.active: dragArea.drag.active
+        Drag.hotSpot.x: dragArea.width / 2
+        Drag.hotSpot.y: dragArea.height / 2
+
+        z: Drag.active ? 100 : 0
+
+        RowLayout {
+            anchors.fill: parent
+
+            Item {
+                Layout.leftMargin: 4
+                height: 32
+                width: 32
+
+                PlasmaCore.IconItem {
+                    anchors.centerIn: parent
+                    height: 18
+                    width: height
+                    source: "application-menu"
+                    visible: itemRootMouseArea.containsMouse
+                }
+
+                MouseArea {
+                    id: dragArea
+                    anchors.fill: parent
+                    drag.target: dragableItem
+                    cursorShape: dragArea.pressed ? Qt.DragMoveCursor : Qt.OpenHandCursor
+                    onReleased: {
+                        // allways return the item to it's original position
+                        dragableItem.x = dragableItem.base_x
+                        dragableItem.y = Qt.binding(function () {return upperSpacer.height})
+
+//                        if (dragableItem.dropIndex != index
+//                                && dragableItem.dropIndex - 1 != index)
+                            move(index, dragableItem.dropIndex)
+                    }
                 }
             }
 
-            cursorShape: dragArea.pressed ? Qt.DragMoveCursor : Qt.OpenHandCursor
-        }
+            PlasmaComponents.Label {
+                Layout.minimumWidth: 120
+                Layout.fillHeight: true
+                Layout.leftMargin: 4
+                text: model.action
+            }
+            PlasmaComponents.Label {
+                Layout.minimumWidth: 160
+                text: model.from
+            }
+            PlasmaComponents.Label {
+                Layout.minimumWidth: 160
+                text: model.to
+            }
+            //        PlasmaComponents.Label {
+            //            Layout.minimumWidth: 60
+            //            text: model.ipv6 ? "IPv6" : ""
+            //        }
+            PlasmaComponents.Label {
+                Layout.leftMargin: 12
+                text: model.logging
+            }
 
-        PlasmaComponents.Label {
-            Layout.minimumWidth: 120
-            Layout.fillHeight: true
-            Layout.leftMargin: 4
-            text: model.action
-        }
-        PlasmaComponents.Label {
-            Layout.minimumWidth: 160
-            text: model.from
-        }
-        PlasmaComponents.Label {
-            Layout.minimumWidth: 160
-            text: model.to
-        }
-        PlasmaComponents.Label {
-            Layout.minimumWidth: 60
-            text: model.ipv6 ? "IPv6" : ""
-        }
-        PlasmaComponents.Label {
-            Layout.leftMargin: 12
-            text: model.logging
+            Item {
+                //                Layout.fillWidth: true
+                height: 32
+                width: 32
+
+                PlasmaComponents.ToolButton {
+                    id: eraseButton
+                    minimumHeight: 32
+                    minimumWidth: 32
+
+                    visible: false
+                    onHoveredChanged: visible = hovered
+
+                    iconSource: "user-trash"
+                    onClicked: itemRoot.remove(index)
+                }
+            }
         }
     }
 
-    PlasmaComponents.ToolButton {
+
+
+    DropArea {
+        id: lowerDropArea
+        anchors {
+            top: dragableItem.verticalCenter
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+
+        visible: dropAreasVisible && !dragArea.drag.active
+        enabled: !dragArea.drag.active
+
+        onEntered: drag.source.dropIndex = index + 1
+        onExited: drag.source.dropIndex = -1
+    }
+
+    PlasmaCore.FrameSvgItem {
+        id: lowerSpacer
+        anchors.left: parent.left
         anchors.right: parent.right
-        anchors.rightMargin: 24
-        anchors.verticalCenter: parent.verticalCenter
-        visible: itemRoot.containsMouse
+        imagePath: "translucent/widgets/panel-background"
 
-        height: 48
-        iconSource: "entry-delete"
-        onClicked: itemRoot.remove(index)
+        y: dragableItem.height
+        height: 0
+        visible: false
+
+        PlasmaComponents.Label {
+            text: i18n("Drop rule ")
+            anchors.centerIn: parent
+        }
+
+        states: [
+            State {
+                name: "expanded"
+                when: lowerDropArea.containsDrag
+                PropertyChanges {
+                    target: lowerSpacer
+                    height: dragableItem.height
+                    visible: true
+                }
+            }
+        ]
+
+        transitions: Transition {
+            NumberAnimation {
+                properties: "height"
+                easing.type: Easing.InOutQuad
+                duration: 200
+            }
+        }
     }
-
-    states: [
-        State {
-            name: "grabed"
-            when: dragArea.pressed
-            PropertyChanges {
-                target: background
-                opacity: 1
-            }
-        }
-    ]
-    transitions: [
-        Transition {
-            to: "grabed"
-            NumberAnimation {
-                properties: "opacity"
-                easing.type: Easing.InOutQuad
-            }
-        },
-        Transition {
-            from: "grabed"
-            NumberAnimation {
-                properties: "opacity"
-                easing.type: Easing.InOutQuad
-            }
-        }
-    ]
-
-    onClicked: edit(index)
 }
