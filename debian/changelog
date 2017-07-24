@@ -1,3 +1,9 @@
+nomad-firewall (0.4-3) nxos; urgency=medium
+
+  * Improve rules moving
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Mon, 24 Jul 2017 18:20:14 -0500
+
 nomad-firewall (0.4-2) nxos; urgency=medium
 
   * Create rule from logs.
