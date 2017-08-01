@@ -1,3 +1,10 @@
+nomad-firewall (0.4-5) nxos; urgency=medium
+
+  * Change window background to a opaque one.
+  * Enable logs auto-refresh only when the log tab is openend.
+
+ -- Alexis López Zubieta <azubieta90@gmail.com>  Mon, 31 Jul 2017 21:44:11 -0500
+
 nomad-firewall (0.4-4) nxos; urgency=medium
 
   * Improve integration with plasma theme
