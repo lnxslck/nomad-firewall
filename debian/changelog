@@ -1,3 +1,9 @@
+nomad-firewall (0.4-6) nxos; urgency=medium
+
+  * Adding netstat to the build depends 
+
+ -- Alexis Lopez Zubieta <azubieta90@gmail.com>  Fri, 29 Sep 2017 13:05:34 -0500
+
 nomad-firewall (0.4-5) nxos; urgency=medium
 
   * Change window background to a opaque one.
